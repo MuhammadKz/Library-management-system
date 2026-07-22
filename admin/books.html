@@ -52,8 +52,8 @@
                     <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
                 <div class="search-box">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    <input type="text" placeholder="What do you want to find?">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <input type="text" id="headerSearch" placeholder="What do you want to find?" oninput="filterFromHeader()">
                 </div>
                 <div class="flex items-center gap-3">
                     <button class="p-2 hover:bg-gray-100 rounded-lg relative">
@@ -266,6 +266,19 @@
 
         function filterBooks() {
             const query = document.getElementById('searchInput').value.toLowerCase();
+            document.getElementById('headerSearch').value = document.getElementById('searchInput').value;
+            filteredBooks = Store.getBooks().filter(b =>
+                b.title.toLowerCase().includes(query) ||
+                b.author.toLowerCase().includes(query) ||
+                b.category.toLowerCase().includes(query)
+            );
+            currentPage = 1;
+            renderBooks(filteredBooks);
+        }
+
+        function filterFromHeader() {
+            const query = document.getElementById('headerSearch').value.toLowerCase();
+            document.getElementById('searchInput').value = document.getElementById('headerSearch').value;
             filteredBooks = Store.getBooks().filter(b =>
                 b.title.toLowerCase().includes(query) ||
                 b.author.toLowerCase().includes(query) ||
@@ -326,7 +339,15 @@
             loadBooks();
         });
 
-        loadBooks();
+        // Check for search query in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchQuery = urlParams.get('search');
+        if (searchQuery) {
+            document.getElementById('headerSearch').value = searchQuery;
+            filterFromHeader();
+        } else {
+            loadBooks();
+        }
     </script>
 </body>
 </html>
