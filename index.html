@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="login-bg min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md relative z-10 animate-fade-in">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 shadow-lg" style="background: var(--primary);">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Library Management System</h1>
+            <p class="text-gray-500 mt-2 text-sm">Southern University Bangladesh</p>
+        </div>
+
+        <!-- Login Card -->
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+            <h2 class="text-xl font-bold text-gray-900 text-center mb-6">Welcome Back</h2>
+
+            <div id="error-message" class="hidden bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl mb-4 text-sm"></div>
+
+            <form id="loginForm" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Username</label>
+                    <input type="text" id="username" required
+                        class="w-full"
+                        placeholder="Enter your username">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+                    <input type="password" id="password" required
+                        class="w-full"
+                        placeholder="Enter your password">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Login as</label>
+                    <div class="flex gap-3">
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="role" value="admin" class="hidden peer">
+                            <div class="peer-checked:bg-purple-600 peer-checked:text-white peer-checked:shadow-lg peer-checked:shadow-purple-500/25 border-2 border-gray-200 peer-checked:border-transparent rounded-xl px-4 py-3 text-center transition-all duration-200 font-medium text-gray-500">
+                                Admin
+                            </div>
+                        </label>
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="role" value="student" class="hidden peer" checked>
+                            <div class="peer-checked:bg-purple-600 peer-checked:text-white peer-checked:shadow-lg peer-checked:shadow-purple-500/25 border-2 border-gray-200 peer-checked:border-transparent rounded-xl px-4 py-3 text-center transition-all duration-200 font-medium text-gray-500">
+                                Student
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary w-full py-3">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="mt-6 pt-6 border-t border-gray-100">
+                <p class="text-xs text-gray-400 text-center mb-3">Demo Credentials</p>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="bg-gray-50 rounded-xl p-3 text-center">
+                        <p class="font-semibold text-gray-700">Admin</p>
+                        <p class="text-gray-400 mt-1">admin / admin123</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-3 text-center">
+                        <p class="font-semibold text-gray-700">Student</p>
+                        <p class="text-gray-400 mt-1">student1 / student123</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-center text-gray-400 text-xs mt-6">
+            CSE 0613-350 &middot; Software Development Project II
+        </p>
+    </div>
+
+    <script src="js/store.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        if (Auth.isLoggedIn()) {
+            const session = Auth.getSession();
+            window.location.href = session.role === 'admin' ? 'admin/dashboard.html' : 'student/dashboard.html';
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const role = document.querySelector('input[name="role"]:checked').value;
+            const errorDiv = document.getElementById('error-message');
+
+            const session = Auth.login(username, password);
+            if (session) {
+                if (session.role !== role) {
+                    errorDiv.textContent = 'This account is not a ' + role + ' account.';
+                    errorDiv.classList.remove('hidden');
+                    Auth.logout();
+                    return;
+                }
+                window.location.href = session.role === 'admin' ? 'admin/dashboard.html' : 'student/dashboard.html';
+            } else {
+                errorDiv.textContent = 'Invalid username or password.';
+                errorDiv.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
